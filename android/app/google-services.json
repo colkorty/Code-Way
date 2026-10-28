@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "14645245994",
+    "project_id": "dewpoint-codeway",
+    "storage_bucket": "dewpoint-codeway.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:14645245994:android:2ab451597e629bf3562b53",
+        "android_client_info": {
+          "package_name": "com.example.codeway"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCEibueAfIO9NFzyn7Izd0ZsYk0a6aPKfE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
