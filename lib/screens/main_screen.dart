@@ -1,5 +1,5 @@
 import 'package:codeway/app_colors.dart';
-import 'package:codeway/screens/authentication_screen.dart';
+import 'package:codeway/screens/account_screen.dart';
 import 'package:codeway/screens/library_screen.dart';
 import 'package:codeway/screens/map_screen.dart';
 import 'package:codeway/widgets/custom_button.dart';
@@ -42,7 +42,7 @@ class MainScreen extends StatelessWidget {
                                                 context,
                                                 MaterialPageRoute(
                                                     builder: (context) =>
-                                                        const AuthenticationScreen(),
+                                                        const AccountScreen(),
                                                 ),
                                             );
                                         },

@@ -1,10 +1,12 @@
 import 'package:codeway/app_colors.dart';
 import 'package:codeway/models/category_model.dart';
 import 'package:codeway/services/career_data_service.dart';
+import 'package:codeway/services/user_progress_service.dart';
 import 'package:codeway/widgets/direction_button.dart';
 import 'package:codeway/widgets/map_node.dart';
 import 'package:codeway/widgets/map_painter.dart';
 import 'package:codeway/widgets/profession_details_dialog.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import '../models/profession_model.dart';
 
@@ -20,12 +22,48 @@ class _MapScreenState extends State<MapScreen> {
 
     late Future<List<Category>> _categoriesFuture;
     Future<List<Profession>>? _mapFuture;
+    late final Stream<Set<String>> _viewedIdsStream;
     final CareerDataService _careerDataService = CareerDataService();
+    final UserProgressService _userProgressService = UserProgressService();
 
     @override
     void initState() {
         super.initState();
         _categoriesFuture = _careerDataService.getCategories();
+        _viewedIdsStream = _userProgressService.watchViewedProfessionIds();
+    }
+
+    Future<void> _openProfession(Profession profession) async {
+        try {
+            await _userProgressService.markProfessionViewed(profession.id);
+        } on FirebaseException catch (e) {
+            if (!mounted) return;
+
+            ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                    content: Text(
+                        'Не удалось сохранить просмотр: ${e.message ?? e.code}'
+                    ),
+                ),
+            );
+            return;
+        } on StateError catch (e) {
+            if (!mounted) return;
+
+            ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(content: Text(e.message.toString())),
+            );
+            return;
+        }
+
+        if (!mounted) return;
+
+        showDialog(
+            context: context, 
+            barrierDismissible: true,
+            barrierColor: Colors.black.withValues(alpha: 0.65),
+            builder: (context) => ProfessionDetailsDialog(profession: profession),
+        );
     }
 
     @override
@@ -128,7 +166,22 @@ class _MapScreenState extends State<MapScreen> {
                                 const SizedBox(height: 20),
 
                                 Expanded(
-                                    child: _buildMap(_mapFuture!),
+                                    child: StreamBuilder(
+                                        stream: _viewedIdsStream, 
+                                        builder: (context, snapshot) {
+                                            if (snapshot.hasError) {
+                                                return Center(
+                                                    child: Text('Не удалось загрузить прогресс: ${snapshot.error}'),
+                                                );
+                                            }
+
+                                            if (!snapshot.hasData) {
+                                                return const Center(child: CircularProgressIndicator(),);
+                                            }
+
+                                            return _buildMap(_mapFuture!, snapshot.data!);
+                                        }
+                                    ),
                                 ),
                             ],
                         );
@@ -138,7 +191,7 @@ class _MapScreenState extends State<MapScreen> {
         );
     }
 
-    Widget _buildMap(Future<List<Profession>> mapFuture) {
+    Widget _buildMap(Future<List<Profession>> mapFuture, Set<String> viewedIds) {
         return FutureBuilder<List<Profession>>(
             future: mapFuture,
             builder: (context, snapshot) {
@@ -192,19 +245,8 @@ class _MapScreenState extends State<MapScreen> {
                                             top: index * itemHeight,
                                             child: MapNode(
                                                 index: index + 1,
-                                                onTap: () {
-                                                    showDialog<void>(
-                                                        context: context,
-                                                        barrierDismissible: true,
-                                                        barrierColor: Colors.black.withValues(
-                                                            alpha: 0.65,
-                                                        ),
-                                                        builder: (context) =>
-                                                            ProfessionDetailsDialog(
-                                                                profession: professions[index],
-                                                            ),
-                                                    );
-                                                },
+                                                isViewed: viewedIds.contains(professions[index].id),
+                                                onTap: () => _openProfession(professions[index]),
                                             ),
                                         ),
                                     ],

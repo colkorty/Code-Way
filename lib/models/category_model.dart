@@ -17,9 +17,7 @@ class Category {
         final rawPathSequence = data['path_sequence'];
         if (rawPathSequence is! List ||
             rawPathSequence.any((id) => id is! String)) {
-            throw FormatException(
-                'В категории $id поле path_sequence должно быть списком строк.',
-            );
+            throw FormatException('В категории $id поле path_sequence должно быть списком строк.');
         }
 
         final rawOrder = data['order'];

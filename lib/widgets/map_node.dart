@@ -4,10 +4,12 @@ import 'package:codeway/app_colors.dart';
 class MapNode extends StatefulWidget {
     final int index;
     final VoidCallback onTap;
+    final bool isViewed;
 
     const MapNode({
         super.key,
         required this.index,
+        required this.isViewed,
         required this.onTap,
     });
 
@@ -41,14 +43,20 @@ class _MapNodeState extends State<MapNode> {
                         ),
                     ),
                     alignment: Alignment.center,
-                    child: Text(
-                        '${widget.index}',
-                        style: TextStyle(
-                            fontSize: 25,
+                    child: widget.isViewed
+                        ? Icon(
+                            Icons.check,
+                            size: 40,
                             color: context.colors.mainElements,
-                            fontWeight: FontWeight.w800,
+                        )
+                        : Text(
+                            '${widget.index}',
+                            style: TextStyle(
+                                fontSize: 25,
+                                color: context.colors.mainElements,
+                                fontWeight: FontWeight.w800,
+                            ),
                         ),
-                    ),
                 ),
             ),
         );

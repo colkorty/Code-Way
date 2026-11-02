@@ -2,7 +2,9 @@ import 'package:codeway/app_colors.dart';
 import 'package:codeway/models/category_model.dart';
 import 'package:codeway/models/profession_model.dart';
 import 'package:codeway/services/career_data_service.dart';
+import 'package:codeway/services/user_progress_service.dart';
 import 'package:codeway/widgets/profession_details_dialog.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 
 class LibraryScreen extends StatefulWidget {
@@ -14,6 +16,7 @@ class LibraryScreen extends StatefulWidget {
 
 class _LibraryScreenState extends State<LibraryScreen> {
     final CareerDataService _careerDataService = CareerDataService();
+    final UserProgressService _userProgressService = UserProgressService();
     late final Future<List<LibraryCategory>> _categoriesFuture;
 
     @override
@@ -167,7 +170,7 @@ class _CategoryExpansionTile extends StatelessWidget {
                         ),
                     ),
                     subtitle: Text(
-                        '${category.professions.length} профессий',
+                        'профессий: ${category.professions.length}',
                         style: TextStyle(
                             color: colors.mainElements.withValues(alpha: 0.7),
                             fontSize: 12,
