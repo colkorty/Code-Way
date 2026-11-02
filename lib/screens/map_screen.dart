@@ -1,6 +1,6 @@
 import 'package:codeway/app_colors.dart';
-import 'package:codeway/services/get_categories_from_firebase.dart';
-import 'package:codeway/services/map_service.dart';
+import 'package:codeway/models/category_model.dart';
+import 'package:codeway/services/career_data_service.dart';
 import 'package:codeway/widgets/direction_button.dart';
 import 'package:codeway/widgets/map_node.dart';
 import 'package:codeway/widgets/map_painter.dart';
@@ -18,120 +18,122 @@ class MapScreen extends StatefulWidget {
 class _MapScreenState extends State<MapScreen> {
     String _selectedCategoryId = '';
 
-    late Future<List<Map<String, dynamic>>> _categoriesFuture;
+    late Future<List<Category>> _categoriesFuture;
     Future<List<Profession>>? _mapFuture;
-    final MapService _mapService = MapService();
+    final CareerDataService _careerDataService = CareerDataService();
 
     @override
     void initState() {
         super.initState();
-        _categoriesFuture = getCategoriesFromFirebase();
+        _categoriesFuture = _careerDataService.getCategories();
     }
 
     @override
     Widget build(BuildContext context) {
         return Scaffold(
             backgroundColor: context.colors.mainBackground,
-            body: FutureBuilder<List<Map<String, dynamic>>>(
-                future: _categoriesFuture,
-                builder: (context, snapshot) {
-                    if (snapshot.connectionState == ConnectionState.waiting) {
-                        return const Center(child: CircularProgressIndicator());
-                    }
+            body: SafeArea(
+                child: FutureBuilder<List<Category>>(
+                    future: _categoriesFuture,
+                    builder: (context, snapshot) {
+                        if (snapshot.connectionState == ConnectionState.waiting) {
+                            return const Center(child: CircularProgressIndicator());
+                        }
 
-                    if (snapshot.hasError) {
-                        return Center(
-                            child: Text('Ошибка загрузки категорий: ${snapshot.error}'),
-                        );
-                    }
+                        if (snapshot.hasError) {
+                            return Center(
+                                child: Text('Ошибка загрузки категорий: ${snapshot.error}'),
+                            );
+                        }
 
-                    final categories = snapshot.data ?? [];
-                    if (categories.isEmpty) {
-                        return const Center(child: Text('Категории не найдены'));
-                    }
+                        final categories = snapshot.data ?? [];
+                        if (categories.isEmpty) {
+                            return const Center(child: Text('Категории не найдены'));
+                        }
 
-                    final selectedCategoryId = _selectedCategoryId.isEmpty
-                        ? categories.first['id'] as String
-                        : _selectedCategoryId;
-                    _mapFuture ??= _mapService.getMapForCategory(selectedCategoryId);
+                        final selectedCategoryId = _selectedCategoryId.isEmpty
+                            ? categories.first.id
+                            : _selectedCategoryId;
+                        _mapFuture ??=
+                            _careerDataService.getMapForCategory(selectedCategoryId);
 
-                    return Column(
-                        children: [
-                            const SizedBox(height: 50),
-                            
-                            Row(
-                                mainAxisAlignment: MainAxisAlignment.start,
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                children: [
-                                    Padding(
-                                        padding: const EdgeInsets.symmetric(horizontal: 30),
-                                        child: GestureDetector(
-                                            onTap: () {
-                                                Navigator.pop(context);
-                                            },
-                                            child: Text(
-                                                '❮❮',
-                                                style: TextStyle(
+                        return Column(
+                            children: [
+                                Padding(
+                                    padding: const EdgeInsets.fromLTRB(12, 8, 20, 8),
+                                    child: Row(
+                                        children: [
+                                            IconButton(
+                                                tooltip: 'Назад',
+                                                onPressed: () => Navigator.pop(context),
+                                                icon: Icon(
+                                                    Icons.arrow_back,
                                                     color: context.colors.mainElements,
-                                                    fontSize: 30,
                                                 ),
                                             ),
+                                            const SizedBox(width: 8),
+                                            Text(
+                                                'Карта',
+                                                style: TextStyle(
+                                                    color: context.colors.mainElements,
+                                                    fontSize: 22,
+                                                    fontWeight: FontWeight.w700,
+                                                ),
+                                            ),
+                                        ],
+                                    ),
+                                ),
+
+                                Container(
+                                    height: 84,
+                                    margin: const EdgeInsets.symmetric(vertical: 8),
+                                    child: ListView.builder(
+                                        scrollDirection: Axis.horizontal,
+                                        itemCount: categories.length,
+                                        padding: const EdgeInsets.symmetric(horizontal: 12),
+                                        itemBuilder: (context, index) {
+                                            final category = categories[index];
+                                            final categoryId = category.id;
+
+                                            return Padding(
+                                                padding: const EdgeInsets.symmetric(horizontal: 4),
+                                                child: DirectionButton(
+                                                    text: category.name,
+                                                    maxWidth: 210,
+                                                    isSelected: categoryId == selectedCategoryId,
+                                                    onTap: () {
+                                                        setState(() {
+                                                            _selectedCategoryId = categoryId;
+                                                            _mapFuture = _careerDataService
+                                                                .getMapForCategory(categoryId);
+                                                        });
+                                                    },
+                                                ),
+                                            );
+                                        },
+                                    ),
+                                ),
+
+                                Padding(
+                                    padding: const EdgeInsets.symmetric(horizontal: 20),
+                                    child: Divider(
+                                        height: 1,
+                                        thickness: 1,
+                                        color: context.colors.border.withValues(
+                                            alpha: 0.35,
                                         ),
                                     ),
-                                ],
-                            ),
-
-                            const SizedBox(height: 20),
-
-                            Container(
-                                height: 84,
-                                margin: const EdgeInsets.symmetric(vertical: 8),
-                                child: ListView.builder(
-                                    scrollDirection: Axis.horizontal,
-                                    itemCount: categories.length,
-                                    padding: const EdgeInsets.symmetric(horizontal: 12),
-                                    itemBuilder: (context, index) {
-                                        final category = categories[index];
-                                        final categoryId = category['id'] as String;
-
-                                        return Padding(
-                                            padding: const EdgeInsets.symmetric(horizontal: 4),
-                                            child: DirectionButton(
-                                                text: category['name'] as String,
-                                                maxWidth: 210,
-                                                isSelected: categoryId == selectedCategoryId,
-                                                onTap: () {
-                                                    setState(() {
-                                                        _selectedCategoryId = categoryId;
-                                                        _mapFuture =
-                                                            _mapService.getMapForCategory(categoryId);
-                                                    });
-                                                },
-                                            ),
-                                        );
-                                    },
                                 ),
-                            ),
 
-                            Padding(
-                                padding: const EdgeInsets.symmetric(horizontal: 12),
-                                child: Divider(
-                                    height: 1,
-                                    thickness: 1,
-                                    color: context.colors.buttonBorder.withValues(
-                                        alpha: 0.35,
-                                    ),
+                                const SizedBox(height: 20),
+
+                                Expanded(
+                                    child: _buildMap(_mapFuture!),
                                 ),
-                            ),
-
-                            const SizedBox(height: 20),
-
-                            Expanded(
-                                child: _buildMap(_mapFuture!),
-                            ),
-                        ],
-                    );
-                },
+                            ],
+                        );
+                    },
+                ),
             ),
         );
     }
@@ -173,7 +175,7 @@ class _MapScreenState extends State<MapScreen> {
                                             child: CustomPaint(
                                                 painter: MapPainter(
                                                     count: professions.length,
-                                                    lineColor: context.colors.buttonBorder,
+                                                    lineColor: context.colors.border,
                                                     itemHeight: itemHeight,
                                                     nodeSize: nodeSize,
                                                     sideOffset: sideOffset,

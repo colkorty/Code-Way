@@ -26,8 +26,8 @@ class _CustomButtonState extends State<CustomButton> {
 
     @override
     Widget build(BuildContext context) {
-        final buttonFillColor = context.colors.buttonFill;
-        final buttonBorderColor = context.colors.buttonBorder;
+        final fillColor = context.colors.fill;
+        final borderColor = context.colors.border;
 
         return Center(
             child: ConstrainedBox(
@@ -58,10 +58,10 @@ class _CustomButtonState extends State<CustomButton> {
                                         duration: const Duration(milliseconds: 10),
                                         curve: Curves.easeOut,
                                         decoration: BoxDecoration(
-                                            color: buttonFillColor,
+                                            color: fillColor,
                                             borderRadius: BorderRadius.circular(animatedRadius),
                                             border: Border.all(
-                                                color: buttonBorderColor,
+                                                color: borderColor,
                                                 width: 5,
                                             ),
                                         ),

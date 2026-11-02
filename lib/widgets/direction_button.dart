@@ -48,10 +48,10 @@ class _DirectionButtonState extends State<DirectionButton> {
                                     vertical: 8,
                                 ),
                                 decoration: BoxDecoration(
-                                    color: context.colors.buttonFill,
+                                    color: context.colors.fill,
                                     borderRadius: BorderRadius.circular(20),
                                     border: Border.all(
-                                        color: context.colors.buttonBorder,
+                                        color: context.colors.border,
                                         width: 5,
                                     ),
                                 ),

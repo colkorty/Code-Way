@@ -3,15 +3,15 @@ import 'package:flutter/material.dart';
 class AppColors extends ThemeExtension<AppColors> {
     final Color mainBackground;
     final Color mainElements;
-    final Color buttonFill;
-    final Color buttonBorder;
+    final Color fill;
+    final Color border;
     final Color buttonText;
 
     const AppColors({
         required this.mainBackground,
         required this.mainElements,
-        required this.buttonFill,
-        required this.buttonBorder,
+        required this.fill,
+        required this.border,
         required this.buttonText,
     });
 
@@ -25,8 +25,8 @@ class AppColors extends ThemeExtension<AppColors> {
         return AppColors(
             mainBackground: Color.lerp(mainBackground, other.mainBackground, t)!,
             mainElements: Color.lerp(mainElements, other.mainElements, t)!,
-            buttonFill: Color.lerp(buttonFill, other.buttonFill, t)!,
-            buttonBorder: Color.lerp(buttonBorder, other.buttonBorder, t)!,
+            fill: Color.lerp(fill, other.fill, t)!,
+            border: Color.lerp(border, other.border, t)!,
             buttonText: Color.lerp(buttonText, other.buttonText, t)!,
         );
     }

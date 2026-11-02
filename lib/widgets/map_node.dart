@@ -33,10 +33,10 @@ class _MapNodeState extends State<MapNode> {
                     width: 70,
                     height: 70,
                     decoration: BoxDecoration(
-                        color: context.colors.buttonFill,
+                        color: context.colors.fill,
                         shape: BoxShape.circle,
                         border: Border.all(
-                            color: context.colors.buttonBorder,
+                            color: context.colors.border,
                             width: 5,
                         ),
                     ),

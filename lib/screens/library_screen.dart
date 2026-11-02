@@ -1,6 +1,7 @@
 import 'package:codeway/app_colors.dart';
+import 'package:codeway/models/category_model.dart';
 import 'package:codeway/models/profession_model.dart';
-import 'package:codeway/services/library_service.dart';
+import 'package:codeway/services/career_data_service.dart';
 import 'package:codeway/widgets/profession_details_dialog.dart';
 import 'package:flutter/material.dart';
 
@@ -12,13 +13,13 @@ class LibraryScreen extends StatefulWidget {
 }
 
 class _LibraryScreenState extends State<LibraryScreen> {
-    final LibraryService _libraryService = LibraryService();
+    final CareerDataService _careerDataService = CareerDataService();
     late final Future<List<LibraryCategory>> _categoriesFuture;
 
     @override
     void initState() {
         super.initState();
-        _categoriesFuture = _libraryService.getCategoriesWithProfessions();
+        _categoriesFuture = _careerDataService.getCategoriesWithProfessions();
     }
 
     @override
@@ -57,7 +58,7 @@ class _LibraryScreenState extends State<LibraryScreen> {
                             child: Divider(
                                 height: 1,
                                 thickness: 1,
-                                color: context.colors.buttonBorder.withValues(alpha: 0.35),
+                                color: context.colors.border.withValues(alpha: 0.35),
                             ),
                         ),
                         Expanded(
@@ -139,14 +140,14 @@ class _CategoryExpansionTile extends StatelessWidget {
         return Theme(
             data: Theme.of(context).copyWith(
                 dividerColor: Colors.transparent,
-                splashColor: colors.buttonBorder.withValues(alpha: 0.15),
-                highlightColor: colors.buttonBorder.withValues(alpha: 0.08),
+                splashColor: colors.border.withValues(alpha: 0.15),
+                highlightColor: colors.border.withValues(alpha: 0.08),
             ),
             child: Container(
                 decoration: BoxDecoration(
-                    color: colors.buttonFill,
+                    color: colors.fill,
                     borderRadius: BorderRadius.circular(20),
-                    border: Border.all(color: colors.buttonBorder, width: 2),
+                    border: Border.all(color: colors.border, width: 2),
                 ),
                 child: ExpansionTile(
                     collapsedShape: RoundedRectangleBorder(
@@ -158,7 +159,7 @@ class _CategoryExpansionTile extends StatelessWidget {
                     iconColor: colors.mainElements,
                     collapsedIconColor: colors.mainElements,
                     title: Text(
-                        category.name,
+                        category.category.name,
                         style: TextStyle(
                             color: colors.mainElements,
                             fontSize: 16,
@@ -194,12 +195,12 @@ class _CategoryExpansionTile extends StatelessWidget {
                                     thickness: 1,
                                     indent: 16,
                                     endIndent: 16,
-                                    color: colors.buttonBorder.withValues(alpha: 0.35),
+                                    color: colors.border.withValues(alpha: 0.35),
                                 ),
                                 ListTile(
                                     leading: CircleAvatar(
                                         radius: 16,
-                                        backgroundColor: colors.buttonBorder,
+                                        backgroundColor: colors.border,
                                         child: Text(
                                             '${index + 1}',
                                             style: TextStyle(
